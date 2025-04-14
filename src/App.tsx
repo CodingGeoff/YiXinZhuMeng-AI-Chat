@@ -3,6 +3,7 @@ import SendIcon from '@mui/icons-material/Send';
 import OpenAI from "openai";
 
 
+
 const client = new OpenAI({
     baseURL: "https://ai.gitee.com/v1",
     apiKey: process.env.REACT_APP_GITEE_API_KEY,
