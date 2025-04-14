@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/YiXinZhuMeng-AI-Chat/static/css/main.953b8ef9.css",
+    "main.js": "/YiXinZhuMeng-AI-Chat/static/js/main.f84ff3e2.js",
+    "static/js/453.ee9bdffa.chunk.js": "/YiXinZhuMeng-AI-Chat/static/js/453.ee9bdffa.chunk.js",
+    "index.html": "/YiXinZhuMeng-AI-Chat/index.html",
+    "main.953b8ef9.css.map": "/YiXinZhuMeng-AI-Chat/static/css/main.953b8ef9.css.map",
+    "main.f84ff3e2.js.map": "/YiXinZhuMeng-AI-Chat/static/js/main.f84ff3e2.js.map",
+    "453.ee9bdffa.chunk.js.map": "/YiXinZhuMeng-AI-Chat/static/js/453.ee9bdffa.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.953b8ef9.css",
+    "static/js/main.f84ff3e2.js"
+  ]
+}
