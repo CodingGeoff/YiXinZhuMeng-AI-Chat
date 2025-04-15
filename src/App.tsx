@@ -41,7 +41,7 @@ const App: React.FC = () => {
             color: 'white',
             padding: '12px 20px',
             display: 'flex' as const,
-            justifyContent: 'space-between' as const,
+            justifyContent: 'center' as const,
             alignItems: 'center' as const,
             fontSize: '20px',
         },
