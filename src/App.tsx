@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import OpenAI from "openai";
-
-
+import { styles } from './styles';
 
 const client = new OpenAI({
     baseURL: "https://ai.gitee.com/v1",
@@ -19,177 +18,158 @@ interface Message {
 
 const App: React.FC = () => {
     const [input, setInput] = useState('');
-    const [messages, setMessages] = useState<Message[]>([
-        {
-            content: '你好，我是译心筑梦团队的AI小助手！你现在可以向我提问了！',
-            isAI: true,
-            timestamp: new Date(),
-        },
-    ]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const styles = {
-        container: {
-            maxWidth: '600px',
-            margin: '20px auto',
-            padding: '0',
-            fontFamily: 'Segoe UI, sans-serif',
-        },
-        header: {
-            background: '#34c7eb',
-            color: 'white',
-            padding: '12px 20px',
-            display: 'flex' as const,
-            justifyContent: 'space-between' as const,
-            alignItems: 'center' as const,
-            fontSize: '20px',
-        },
-        subHeader: {
-            textAlign: 'center' as const,
-            color: '#666',
-            fontSize: '14px',
-            margin: '10px 0 20px',
-        },
-        chatContainer: {
-            border: '1px solid #e0e0e0',
-            borderRadius: '10px',
-            overflow: 'hidden' as const,
-            flexDirection: 'column' as const,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        },
-        messagesArea: {
-            flex: 1,
-            padding: '20px',
-            overflowY: 'auto' as const,
-            backgroundColor: '#f8f9fa',
-        },
-        userBubble: {
-            background: '#bbdefb',
-            borderRadius: 18,
-            marginLeft: 'auto' as const,
-            maxWidth: '75%',
-            padding: '14px 18px',
-            marginBottom: '16px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            wordBreak: 'break-all' as const,
-        },
-        aiBubble: {
-            background: '#f5f5f5',
-            borderRadius: 18,
-            marginRight: 'auto' as const,
-            maxWidth: '75%',
-            padding: '14px 18px',
-            marginBottom: '16px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            wordBreak: 'break-all' as const,
-            display: 'flex' as const,
-            alignItems: 'flex-start' as const,
-        },
-        inputArea: {
-            borderTop: '1px solid #e0e0e0',
-            padding: '20px',
-            display: 'flex' as const,
-            gap: '10px',
-        },
-        input: {
-            flex: 1,
-            padding: '14px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            fontSize: '16px',
-        },
-        button: {
-            background: '#007bff',
-            color: 'white',
-            border: 'none' as const,
-            borderRadius: '8px',
-            padding: '14px 24px',
-            cursor: 'pointer',
-            fontSize: '16px',
-            display: 'flex' as const,
-            alignItems: 'center' as const,
-            gap: 8,
-        },
-        aiIcon: {
-            background: '#333',
-            color: 'white',
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            display: 'flex' as const,
-            alignItems: 'center' as const,
-            justifyContent: 'center' as const,
-            marginRight: '12px',
-            fontSize: '14px',
-        },
-    };
-
+    // 消息滚动控制
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
+    // 初始化加载消息
+    useEffect(() => {
+        const initializeChat = async () => {
+            try {
+                const response = await fetch('/.netlify/functions/getMessages');
+                if (!response.ok) throw new Error('HTTP error: ' + response.status);
+                
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    const welcomeMessage = {
+                        content: '你好，我是译心筑梦团队的AI小助手！你现在可以向我提问了！',
+                        isAI: true,
+                        timestamp: new Date()
+                    };
+                    await saveMessage(welcomeMessage);
+                    setMessages([welcomeMessage]);
+                } else {
+                    const formattedMessages = data.map((msg: any) => ({
+                        content: msg.content,
+                        isAI: msg.isAI,
+                        timestamp: new Date(msg.timestamp)
+                    }));
+                    setMessages(formattedMessages);
+                }
+            } catch (error) {
+                console.error('初始化失败:', error);
+                setMessages([{
+                    content: '对话记录加载失败，请检查网络连接',
+                    isAI: true,
+                    timestamp: new Date()
+                }]);
+            }
+        };
+
+        initializeChat();
+    }, []);
+
+    // 实时滚动
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
 
-    const handleSubmit = async () => {
-        if (!input.trim()) return;
+    // 保存消息到数据库
+    const saveMessage = async (message: Message) => {
+        try {
+            const response = await fetch('/.netlify/functions/saveMessage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...message,
+                    timestamp: message.timestamp.toISOString()
+                })
+            });
+            
+            if (!response.ok) throw new Error('保存失败: ' + response.status);
+        } catch (error) {
+            console.error('消息保存失败:', error);
+        }
+    };
 
+    // 处理用户提交
+    const handleSubmit = async () => {
+        if (!input.trim() || loading) return;
+
+        // 用户消息处理
         const userMessage: Message = {
             content: input.trim(),
             isAI: false,
-            timestamp: new Date(),
+            timestamp: new Date()
         };
-
-        setMessages(prev => [...prev, userMessage]);
-        setInput('');
-        setLoading(true);
-
+        
         try {
+            setMessages(prev => [...prev, userMessage]);
+            await saveMessage(userMessage);
+            setInput('');
+            setLoading(true);
+
+            // 流式获取AI响应
             const response = await client.chat.completions.create({
                 model: "DeepSeek-R1-Distill-Qwen-14B",
                 stream: true,
                 max_tokens: 1024,
                 temperature: 0.6,
-                top_p: 0.7,
-                // top_k: 50,
-                frequency_penalty: 0,
                 messages: [
-                    {
-                        "role": "system",
-                        "content": "You are a helpful and harmless assistant. You should think step - by - step."
+                    { 
+                        role: "system", 
+                        content: `你是一个专业助手，请分步骤解释复杂问题`
                     },
-                    {
-                        "role": "user",
-                        "content": input.trim()
-                    }
+                    { role: "user", content: input.trim() }
                 ],
             });
 
             let fullAnswer = '';
-            for await (const part of response) {
-                const content = part.choices[0]?.delta?.content;
-                if (content) {
-                    fullAnswer += content;
+            let isNewMessage = true;
+            
+            for await (const chunk of response) {
+                const content = chunk.choices[0]?.delta?.content || '';
+                fullAnswer += content;
+
+                setMessages(prev => {
+                    const newMessages = [...prev];
+                    const lastMessage = newMessages[newMessages.length - 1];
+                    
+                    if (lastMessage?.isAI) {
+                        // 更新现有AI消息
+                        lastMessage.content += content;
+                        return newMessages;
+                    } else {
+                        // 创建新AI消息
+                        return [...newMessages, {
+                            content: content,
+                            isAI: true,
+                            timestamp: new Date()
+                        }];
+                    }
+                });
+                
+                // 优化滚动体验
+                if (content.includes('\n') || content.length > 30) {
+                    scrollToBottom();
                 }
             }
 
+            // 保存完整消息
             const aiMessage: Message = {
                 content: fullAnswer,
                 isAI: true,
-                timestamp: new Date(),
+                timestamp: new Date()
             };
+            await saveMessage(aiMessage);
 
-            setMessages(prev => [...prev, aiMessage]);
         } catch (error) {
-            setMessages(prev => [...prev, {
-                content: '请求失败，请稍后重试',
+            const errorMessage: Message = {
+                content: '请求失败，请稍后重试（错误代码: 500）',
                 isAI: true,
-                timestamp: new Date(),
-            }]);
+                timestamp: new Date()
+            };
+            setMessages(prev => [...prev, errorMessage]);
+            await saveMessage(errorMessage);
         } finally {
             setLoading(false);
+            scrollToBottom();
         }
     };
 
@@ -197,14 +177,9 @@ const App: React.FC = () => {
         <div style={styles.container}>
             <div style={styles.header}>
                 <h2 style={{ margin: 0 }}>人工智能 AI 问答</h2>
-                <div style={{ display: 'flex', gap: 4 }}>
+                <div style={styles.statusIndicator}>
                     {[...Array(3)].map((_, i) => (
-                        <span key={i} style={{
-                            width: '6px',
-                            height: '6px',
-                            borderRadius: '50%',
-                            background: 'white'
-                        }}></span>
+                        <span key={i} style={styles.statusDot}></span>
                     ))}
                 </div>
             </div>
@@ -215,20 +190,24 @@ const App: React.FC = () => {
                     {messages.map((message, index) => (
                         <div
                             key={index}
-                            style={message.isAI
-                                ? { display: 'flex', alignItems: 'center', marginBottom: '16px' }
-                                : { display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}
+                            style={message.isAI ? styles.aiMessageContainer : styles.userMessageContainer}
                         >
                             {message.isAI && <div style={styles.aiIcon}>AI</div>}
                             <div style={message.isAI ? styles.aiBubble : styles.userBubble}>
-                                {message.content}
+                                {message.content.split('\n').map((line, i) => (
+                                    <p key={i} style={{ margin: '4px 0' }}>{line}</p>
+                                ))}
                             </div>
                         </div>
                     ))}
                     {loading && (
-                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+                        <div style={styles.aiMessageContainer}>
                             <div style={styles.aiIcon}>AI</div>
-                            <div style={styles.aiBubble}>思考中...</div>
+                            <div style={styles.aiBubble}>
+                                <div style={styles.thinkingAnimation}>
+                                    <span>.</span><span>.</span><span>.</span>
+                                </div>
+                            </div>
                         </div>
                     )}
                     <div ref={messagesEndRef} />
@@ -239,16 +218,18 @@ const App: React.FC = () => {
                         type="text"
                         style={styles.input}
                         value={input}
-                        placeholder="输入你的问题"
+                        placeholder="输入你的问题..."
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
+                        disabled={loading}
                     />
                     <button
-                        style={styles.button}
+                        style={{ ...styles.button, ...(loading && styles.disabledButton) }}
                         onClick={handleSubmit}
                         disabled={loading}
                     >
-                        <SendIcon style={{ fontSize: '20px' }} />
+                        <SendIcon style={styles.sendIcon} />
+                        {loading ? '发送中...' : '发送'}
                     </button>
                 </div>
             </div>
@@ -257,4 +238,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-    
