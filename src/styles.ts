@@ -127,12 +127,27 @@ export const styles: { [key: string]: CSSProperties } = {
     thinkingAnimation: {
         display: 'inline-flex',
         gap: '4px',
-        '& span': {
-            animation: 'blink 1.4s infinite',
-            '&:nth-child(2)': { animationDelay: '0.2s' },
-            '&:nth-child(3)': { animationDelay: '0.4s' },
+        // 移除嵌套选择器
+    } as CSSProperties,
+    // 添加单独的span样式
+    thinkingDot: {
+        animation: 'blink 1.4s infinite',
+        '&:nth-child(2)': {
+            animationDelay: '0.2s'
+        },
+        '&:nth-child(3)': {
+            animationDelay: '0.4s'
         }
-    }
+    } as CSSProperties,
+
+    // // 在全局样式中添加动画
+    // const styleSheet = document.styleSheets[0];
+    // styleSheet.insertRule(`
+    //     @keyframes blink {
+    //         0%, 100% { opacity: 0.2; }
+    //         50% { opacity: 1; }
+    //     }
+    // `);
 };
 
 // 在全局样式中添加动画
