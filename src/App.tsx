@@ -197,7 +197,7 @@ const App: React.FC = () => {
         <div style={styles.container}>
             <div style={styles.header}>
                 <h2 style={{ margin: 0 }}>人工智能 AI 问答</h2>
-                <div style={{ display: 'flex', gap: 4 }}>
+                {/* <div style={{ display: 'flex', gap: 4 }}>
                     {[...Array(3)].map((_, i) => (
                         <span key={i} style={{
                             width: '6px',
@@ -206,7 +206,7 @@ const App: React.FC = () => {
                             background: 'white'
                         }}></span>
                     ))}
-                </div>
+                </div> */}
             </div>
             <div style={styles.subHeader}>AI问答（DeepSeek - R1）</div>
 
