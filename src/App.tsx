@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from'react';
 import SendIcon from '@mui/icons-material/Send';
 import OpenAI from "openai";
 
@@ -142,7 +142,8 @@ const App: React.FC = () => {
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '20px',
-            background: '#34c7eb',
+            background: 'black',
+            color: 'white'
         } as const,
         thinkingBubble: {
             background: '#f5f5f5',
@@ -278,7 +279,7 @@ const App: React.FC = () => {
                     type="text"
                     style={styles.input}
                     value={input}
-                    placeholder="输入你的问题"
+                    placeholder="输入你的问题（支持长文本）"
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
                 />
