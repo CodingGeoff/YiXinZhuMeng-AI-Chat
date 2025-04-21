@@ -54,6 +54,7 @@ const App: React.FC = () => {
             color: '#666',
             fontSize: '14px',
             margin: '10px 0 10px',
+            paddingbuttom: '20px',
         },
         chatContainer: {
             border: '1px solid #e0e0e0',
@@ -75,8 +76,9 @@ const App: React.FC = () => {
 
             overflowY: 'auto' as const,
             backgroundColor: '#f8f9fa',
-            height: '100%', // 让消息区域撑满可用空间
+            // height: '100%', // 让消息区域撑满可用空间
             paddingTop: '50px',
+
         },
         userBubble: {
             background: '#bbdefb',
