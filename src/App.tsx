@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from'react';
+import React, { useState, useRef, useEffect } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import OpenAI from "openai";
 
@@ -134,17 +134,6 @@ const App: React.FC = () => {
             maxWidth: '64px',
             height: '48px',
         } as const,
-        aiIcon: {
-            width: '48px',
-            height: '48px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '20px',
-            background: 'black',
-            color: 'white'
-        } as const,
         thinkingBubble: {
             background: '#f5f5f5',
             borderRadius: 16,
@@ -250,9 +239,6 @@ const App: React.FC = () => {
                                 : { display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }
                             }
                         >
-                            {message.isAI && (
-                                <div style={styles.aiIcon}>AI</div>
-                            )}
                             <div style={message.isAI ? styles.aiBubble : styles.userBubble}>
                                 {message.content}
                                 {message.thinkingContent && (
@@ -266,7 +252,6 @@ const App: React.FC = () => {
                     ))}
                     {loading && (
                         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-                            <div style={styles.aiIcon}>AI</div>
                             <div style={styles.aiBubble}>思考中...</div>
                         </div>
                     )}
@@ -279,7 +264,7 @@ const App: React.FC = () => {
                     type="text"
                     style={styles.input}
                     value={input}
-                    placeholder="输入你的问题（支持长文本）"
+                    placeholder="输入你的问题"
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
                 />
