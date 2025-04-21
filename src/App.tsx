@@ -2,8 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import OpenAI from "openai";
 
-
-
 const client = new OpenAI({
     baseURL: "https://ai.gitee.com/v1",
     apiKey: process.env.REACT_APP_GITEE_API_KEY,
@@ -13,6 +11,7 @@ const client = new OpenAI({
 
 interface Message {
     content: string;
+    thinkingContent?: string;
     isAI: boolean;
     timestamp: Date;
 }
@@ -31,124 +30,124 @@ const App: React.FC = () => {
 
     const styles = {
         container: {
-            // maxWidth: '600px',
-            // margin: '20px auto',
-
-            width: '100%', // 占满屏幕宽度
-            height: '100vh', // 占满视口高度
-            margin: '0', // 移除边距
-            padding: '0',
+            width: '100%',
+            height: '100vh',
+            margin: 0,
+            padding: 0,
             fontFamily: 'Segoe UI, sans-serif',
-        },
+        } as const,
         header: {
             background: '#34c7eb',
             color: 'white',
             padding: '12px 20px',
-            display: 'flex' as const,
-            justifyContent: 'center' as const,
-            alignItems: 'center' as const,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             fontSize: '20px',
-        },
+        } as const,
         subHeader: {
-            textAlign: 'center' as const,
+            textAlign: 'center',
             color: '#666',
             fontSize: '14px',
-            margin: '10px 0 10px',
-            paddingbuttom: '20px',
-        },
+            margin: '10px 0 20px',
+            paddingBottom: '10px',
+        } as const,
         chatContainer: {
+            position: 'relative',
+            height: 'calc(100vh - 160px)',
+            margin: '0 20px',
             border: '1px solid #e0e0e0',
             borderRadius: '10px',
-            overflow: 'hidden' as const,
-            flexDirection: 'column' as const,
+            overflow: 'hidden',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-
-            position: 'relative' as const, // 确保子元素固定定位时不会脱离容器
-            // minHeight: '400px', // 预留内容区域最小高度
-            height: '100%',
-            // marginTop: '50px', // 添加顶部外边距，按需调整
-        },
+        } as const,
         messagesArea: {
-            flex: 1,
-            // padding: '20px',
-
-            padding: '20px 30px', // 左右边距保留一定空间
-
-            overflowY: 'auto' as const,
+            position: 'absolute',
+            top: 0,
+            bottom: 80,
+            left: 0,
+            right: 0,
+            padding: '20px 30px',
+            overflowY: 'auto',
             backgroundColor: '#f8f9fa',
-            // height: '100%', // 让消息区域撑满可用空间
-            paddingTop: '50px',
-
-        },
+        } as const,
         userBubble: {
             background: '#bbdefb',
             borderRadius: 18,
-            marginLeft: 'auto' as const,
+            marginLeft: 'auto',
             maxWidth: '75%',
             padding: '14px 18px',
             marginBottom: '16px',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            wordBreak: 'break-all' as const,
-        },
+            wordBreak: 'break-all',
+        } as const,
         aiBubble: {
             background: '#f5f5f5',
             borderRadius: 18,
-            marginRight: 'auto' as const,
+            marginRight: 'auto',
             maxWidth: '75%',
             padding: '14px 18px',
             marginBottom: '16px',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            wordBreak: 'break-all' as const,
-            display: 'flex' as const,
-            alignItems: 'flex-start' as const,
-        },
+            wordBreak: 'break-all',
+            display: 'flex',
+            alignItems: 'flex-start',
+        } as const,
         inputArea: {
-            // borderTop: '1px solid #e0e0e0',
-            // padding: '20px',
-            // display: 'flex' as const,
-            // gap: '10px',
-            position: 'fixed' as const, // 固定在底部
+            position: 'fixed',
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'white', // 背景色与容器一致
+            background: 'white',
             padding: '20px',
             display: 'flex',
             gap: '10px',
             borderTop: '1px solid #e0e0e0',
-            boxShadow: '0 -2px 4px rgba(0,0,0,0.1)', // 顶部阴影增加层次感
-        },
+            boxShadow: '0 -2px 4px rgba(0,0,0,0.1)',
+            borderBottomLeftRadius: '10px',
+            borderBottomRightRadius: '10px',
+        } as const,
         input: {
             flex: 1,
             padding: '14px',
             border: '1px solid #e0e0e0',
             borderRadius: '8px',
             fontSize: '16px',
-        },
+        } as const,
         button: {
             background: '#007bff',
             color: 'white',
-            border: 'none' as const,
+            border: 'none',
             borderRadius: '8px',
             padding: '14px 24px',
             cursor: 'pointer',
             fontSize: '16px',
-            display: 'flex' as const,
-            alignItems: 'center' as const,
+            display: 'flex',
+            alignItems: 'center',
             gap: 8,
-        },
+        } as const,
         aiIcon: {
             background: '#333',
             color: 'white',
             width: '36px',
             height: '36px',
             borderRadius: '50%',
-            display: 'flex' as const,
-            alignItems: 'center' as const,
-            justifyContent: 'center' as const,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             marginRight: '12px',
             fontSize: '14px',
-        },
+        } as const,
+        thinkingBubble: {
+            background: '#f9f9f9',
+            borderRadius: 14,
+            margin: '8px 0',
+            padding: '10px 14px',
+            fontSize: '14px',
+            color: '#666',
+            wordBreak: 'break-all',
+            display: 'none',
+        } as const,
     };
 
     const scrollToBottom = () => {
@@ -179,12 +178,12 @@ const App: React.FC = () => {
                 max_tokens: 1024,
                 temperature: 0.6,
                 top_p: 0.7,
-                // top_k: 50,
                 frequency_penalty: 0,
                 messages: [
                     {
                         "role": "system",
-                        "content": "You are a helpful and harmless assistant. You should think step - by - step."
+                        "content": "You are a helpful assistant that shows thinking process. " +
+                                   "Respond with [THINKING] tag for reasoning and [ANSWER] tag for final answer."
                     },
                     {
                         "role": "user",
@@ -194,15 +193,29 @@ const App: React.FC = () => {
             });
 
             let fullAnswer = '';
+            let thinkingProcess = '';
+            let inThinking = false;
+
             for await (const part of response) {
-                const content = part.choices[0]?.delta?.content;
-                if (content) {
-                    fullAnswer += content;
+                const content = part.choices[0]?.delta?.content || '';
+                if (content.includes('[THINKING]')) {
+                    inThinking = true;
+                    thinkingProcess += content.replace('[THINKING]', '').trim();
+                } else if (content.includes('[ANSWER]')) {
+                    inThinking = false;
+                    fullAnswer += content.replace('[ANSWER]', '').trim();
+                } else {
+                    if (inThinking) {
+                        thinkingProcess += content;
+                    } else {
+                        fullAnswer += content;
+                    }
                 }
             }
 
             const aiMessage: Message = {
                 content: fullAnswer,
+                thinkingContent: thinkingProcess,
                 isAI: true,
                 timestamp: new Date(),
             };
@@ -223,16 +236,6 @@ const App: React.FC = () => {
         <div style={styles.container}>
             <div style={styles.header}>
                 <h2 style={{ margin: 0 }}>人工智能 AI 问答</h2>
-                {/* <div style={{ display: 'flex', gap: 4 }}>
-                    {[...Array(3)].map((_, i) => (
-                        <span key={i} style={{
-                            width: '6px',
-                            height: '6px',
-                            borderRadius: '50%',
-                            background: 'white'
-                        }}></span>
-                    ))}
-                </div> */}
             </div>
             <div style={styles.subHeader}>AI问答（DeepSeek - R1）</div>
 
@@ -241,46 +244,56 @@ const App: React.FC = () => {
                     {messages.map((message, index) => (
                         <div
                             key={index}
-                            style={message.isAI
-                                ? { display: 'flex', alignItems: 'center', marginBottom: '16px' }
-                                : { display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}
+                            style={message.isAI 
+                                ? { display: 'flex', alignItems: 'flex-start', marginBottom: '24px' } 
+                                : { display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }
+                            }
                         >
                             {message.isAI && <div style={styles.aiIcon}>AI</div>}
                             <div style={message.isAI ? styles.aiBubble : styles.userBubble}>
                                 {message.content}
+                                {message.thinkingContent && (
+                                    <div style={{ 
+                                        ...styles.thinkingBubble, 
+                                        display: 'block', 
+                                        wordBreak: 'break-all'
+                                    }}>
+                                        <span style={{ color: '#999', fontSize: '12px', marginRight: '6px' }}>思考过程：</span>
+                                        {message.thinkingContent}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}
                     {loading && (
-                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '16px' }}>
                             <div style={styles.aiIcon}>AI</div>
                             <div style={styles.aiBubble}>思考中...</div>
                         </div>
                     )}
                     <div ref={messagesEndRef} />
                 </div>
+            </div>
 
-                <div style={styles.inputArea}>
-                    <input
-                        type="text"
-                        style={styles.input}
-                        value={input}
-                        placeholder="输入你的问题"
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
-                    />
-                    <button
-                        style={styles.button}
-                        onClick={handleSubmit}
-                        disabled={loading}
-                    >
-                        <SendIcon style={{ fontSize: '20px' }} />
-                    </button>
-                </div>
+            <div style={styles.inputArea}>
+                <input
+                    type="text"
+                    style={styles.input}
+                    value={input}
+                    placeholder="输入你的问题"
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
+                />
+                <button
+                    style={styles.button}
+                    onClick={handleSubmit}
+                    disabled={loading}
+                >
+                    <SendIcon style={{ fontSize: '20px' }} />
+                </button>
             </div>
         </div>
     );
 };
 
 export default App;
-    
