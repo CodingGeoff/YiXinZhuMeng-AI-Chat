@@ -53,7 +53,7 @@ const App: React.FC = () => {
             textAlign: 'center' as const,
             color: '#666',
             fontSize: '14px',
-            margin: '10px 0 20px',
+            margin: '10px 0 30px',
         },
         chatContainer: {
             border: '1px solid #e0e0e0',
