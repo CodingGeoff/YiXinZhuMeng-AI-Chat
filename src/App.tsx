@@ -41,18 +41,19 @@ const App: React.FC = () => {
         header: {
             background: '#34c7eb',
             color: 'white',
-            padding: '16px 24px',
+            padding: '20px 24px',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            fontSize: '24px',
-            fontWeight: '500',
+            fontSize: '28px',
+            fontWeight: '600',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         } as const,
         subHeader: {
             textAlign: 'center',
             color: '#666',
-            fontSize: '14px',
-            margin: '8px 0 24px',
+            fontSize: '16px',
+            margin: '10px 0 24px',
             paddingBottom: '12px',
         } as const,
         chatContainer: {
@@ -60,9 +61,9 @@ const App: React.FC = () => {
             position: 'relative',
             margin: '0 16px',
             border: '1px solid #e0e0e0',
-            borderRadius: '16px',
+            borderRadius: '20px',
             overflow: 'hidden',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+            boxShadow: '0 6px 12px rgba(0, 0, 0, 0.1)',
         } as const,
         messagesArea: {
             position: 'relative',
@@ -70,31 +71,32 @@ const App: React.FC = () => {
             padding: '24px',
             overflowY: 'auto',
             backgroundColor: '#f8f9fa',
-            // 移除固定定位，改用弹性布局
         } as const,
         userBubble: {
             background: '#bbdefb',
             borderRadius: 24,
             marginLeft: 'auto',
             maxWidth: '80%',
-            padding: '16px 20px',
-            marginBottom: '16px',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+            padding: '18px 20px',
+            marginBottom: '20px',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
             wordBreak: 'break-all',
             fontSize: '16px',
+            display: 'flex',
+            alignItems: 'center',
         } as const,
         aiBubble: {
-            background: 'white', // 改用白色背景提升可读性
+            background: '#fafafa',
             borderRadius: 24,
             marginRight: 'auto',
             maxWidth: '80%',
-            padding: '16px 20px',
-            marginBottom: '16px',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+            padding: '18px 20px',
+            marginBottom: '20px',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
             wordBreak: 'break-all',
             display: 'flex',
-            alignItems: 'flex-start',
-            gap: '12px', // 增加图标与气泡间距
+            alignItems: 'center',
+            gap: '16px',
         } as const,
         inputArea: {
             position: 'fixed',
@@ -104,44 +106,43 @@ const App: React.FC = () => {
             background: 'white',
             padding: '16px 24px',
             display: 'flex',
-            gap: '12px',
+            gap: '16px',
             borderTop: '1px solid #e0e0e0',
-            boxShadow: '0 -4px 16px rgba(0,0,0,0.1)',
+            boxShadow: '0 -4px 16px rgba(0, 0, 0, 0.1)',
             borderTopLeftRadius: '24px',
             borderTopRightRadius: '24px',
         } as const,
         input: {
             flex: 1,
-            padding: '14px 18px',
+            padding: '16px 18px',
             border: '1px solid #e0e0e0',
             borderRadius: '24px',
             fontSize: '16px',
-            // 移动端优化：增加内边距和圆角
         } as const,
         button: {
-            background: '#007bff',
+            background: '#34c7eb',
             color: 'white',
             border: 'none',
             borderRadius: '24px',
-            padding: '14px 24px',
+            padding: '16px 24px',
             cursor: 'pointer',
             fontSize: '16px',
             display: 'flex',
             alignItems: 'center',
-            gap: 8,
-            // 修复图标拉伸问题：使用固定尺寸
-            minWidth: '64px', // 防止按钮在移动端被压缩
+            justifyContent: 'center',
+            minWidth: '64px',
+            maxWidth: '64px',
+            height: '48px',
         } as const,
         aiIcon: {
-            width: '40px', // 增大图标尺寸
-            height: '40px', // 保持宽高一致
-            borderRadius: '50%', // 确保圆形显示
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginRight: '0', // 移除右侧边距，改用气泡内间距
-            fontSize: '18px', // 增大字体
-            background: '#007bff', // 改用主色背景
+            fontSize: '20px',
+            background: '#34c7eb',
         } as const,
         thinkingBubble: {
             background: '#f5f5f5',
@@ -151,7 +152,7 @@ const App: React.FC = () => {
             fontSize: '14px',
             color: '#666',
             wordBreak: 'break-all',
-            display: 'block', // 始终显示，由状态控制
+            display: 'block',
         } as const,
     };
 
@@ -180,7 +181,7 @@ const App: React.FC = () => {
             const response = await client.chat.completions.create({
                 model: "DeepSeek-R1-Distill-Qwen-14B",
                 stream: true,
-                max_tokens: 999999999, // 增加最大token限制
+                max_tokens: 2048,
                 temperature: 0.7,
                 top_p: 0.8,
                 frequency_penalty: 0.2,
@@ -244,7 +245,7 @@ const App: React.FC = () => {
                         <div
                             key={index}
                             style={message.isAI 
-                                ? { display: 'flex', alignItems: 'flex-start', marginBottom: '20px' } 
+                                ? { display: 'flex', alignItems: 'center', marginBottom: '20px' } 
                                 : { display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }
                             }
                         >
@@ -263,7 +264,7 @@ const App: React.FC = () => {
                         </div>
                     ))}
                     {loading && (
-                        <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
                             <div style={styles.aiIcon}>AI</div>
                             <div style={styles.aiBubble}>思考中...</div>
                         </div>
@@ -277,7 +278,7 @@ const App: React.FC = () => {
                     type="text"
                     style={styles.input}
                     value={input}
-                    placeholder="输入你的问题（支持长文本）"
+                    placeholder="输入你的问题"
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
                 />
