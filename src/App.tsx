@@ -31,8 +31,12 @@ const App: React.FC = () => {
 
     const styles = {
         container: {
-            maxWidth: '600px',
-            margin: '20px auto',
+            // maxWidth: '600px',
+            // margin: '20px auto',
+
+            width: '100%', // 占满屏幕宽度
+            height: '100vh', // 占满视口高度
+            margin: '0', // 移除边距
             padding: '0',
             fontFamily: 'Segoe UI, sans-serif',
         },
@@ -57,12 +61,20 @@ const App: React.FC = () => {
             overflow: 'hidden' as const,
             flexDirection: 'column' as const,
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+
+            position: 'relative' as const, // 确保子元素固定定位时不会脱离容器
+            // minHeight: '400px', // 预留内容区域最小高度
+            height: '100%',
         },
         messagesArea: {
             flex: 1,
-            padding: '20px',
+            // padding: '20px',
+
+            padding: '20px 30px', // 左右边距保留一定空间
+
             overflowY: 'auto' as const,
             backgroundColor: '#f8f9fa',
+            height: '100%', // 让消息区域撑满可用空间
         },
         userBubble: {
             background: '#bbdefb',
@@ -87,10 +99,20 @@ const App: React.FC = () => {
             alignItems: 'flex-start' as const,
         },
         inputArea: {
-            borderTop: '1px solid #e0e0e0',
+            // borderTop: '1px solid #e0e0e0',
+            // padding: '20px',
+            // display: 'flex' as const,
+            // gap: '10px',
+            position: 'fixed' as const, // 固定在底部
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'white', // 背景色与容器一致
             padding: '20px',
-            display: 'flex' as const,
+            display: 'flex',
             gap: '10px',
+            borderTop: '1px solid #e0e0e0',
+            boxShadow: '0 -2px 4px rgba(0,0,0,0.1)', // 顶部阴影增加层次感
         },
         input: {
             flex: 1,
