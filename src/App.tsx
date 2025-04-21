@@ -65,6 +65,7 @@ const App: React.FC = () => {
             position: 'relative' as const, // 确保子元素固定定位时不会脱离容器
             // minHeight: '400px', // 预留内容区域最小高度
             height: '100%',
+            // marginTop: '50px', // 添加顶部外边距，按需调整
         },
         messagesArea: {
             flex: 1,
@@ -75,6 +76,7 @@ const App: React.FC = () => {
             overflowY: 'auto' as const,
             backgroundColor: '#f8f9fa',
             height: '100%', // 让消息区域撑满可用空间
+            paddingTop: '50px',
         },
         userBubble: {
             background: '#bbdefb',
