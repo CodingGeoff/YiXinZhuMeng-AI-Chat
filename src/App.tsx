@@ -35,63 +35,66 @@ const App: React.FC = () => {
             margin: 0,
             padding: 0,
             fontFamily: 'Segoe UI, sans-serif',
+            display: 'flex',
+            flexDirection: 'column',
         } as const,
         header: {
             background: '#34c7eb',
             color: 'white',
-            padding: '12px 20px',
+            padding: '16px 24px',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            fontSize: '20px',
+            fontSize: '24px',
+            fontWeight: '500',
         } as const,
         subHeader: {
             textAlign: 'center',
             color: '#666',
             fontSize: '14px',
-            margin: '10px 0 20px',
-            paddingBottom: '10px',
+            margin: '8px 0 24px',
+            paddingBottom: '12px',
         } as const,
         chatContainer: {
+            flex: 1,
             position: 'relative',
-            height: 'calc(100vh - 160px)',
-            margin: '0 20px',
+            margin: '0 16px',
             border: '1px solid #e0e0e0',
-            borderRadius: '10px',
+            borderRadius: '16px',
             overflow: 'hidden',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
         } as const,
         messagesArea: {
-            position: 'absolute',
-            top: 0,
-            bottom: 80,
-            left: 0,
-            right: 0,
-            padding: '20px 30px',
+            position: 'relative',
+            flex: 1,
+            padding: '24px',
             overflowY: 'auto',
             backgroundColor: '#f8f9fa',
+            // 移除固定定位，改用弹性布局
         } as const,
         userBubble: {
             background: '#bbdefb',
-            borderRadius: 18,
+            borderRadius: 24,
             marginLeft: 'auto',
-            maxWidth: '75%',
-            padding: '14px 18px',
+            maxWidth: '80%',
+            padding: '16px 20px',
             marginBottom: '16px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
             wordBreak: 'break-all',
+            fontSize: '16px',
         } as const,
         aiBubble: {
-            background: '#f5f5f5',
-            borderRadius: 18,
+            background: 'white', // 改用白色背景提升可读性
+            borderRadius: 24,
             marginRight: 'auto',
-            maxWidth: '75%',
-            padding: '14px 18px',
+            maxWidth: '80%',
+            padding: '16px 20px',
             marginBottom: '16px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
             wordBreak: 'break-all',
             display: 'flex',
             alignItems: 'flex-start',
+            gap: '12px', // 增加图标与气泡间距
         } as const,
         inputArea: {
             position: 'fixed',
@@ -99,59 +102,61 @@ const App: React.FC = () => {
             right: 0,
             bottom: 0,
             background: 'white',
-            padding: '20px',
+            padding: '16px 24px',
             display: 'flex',
-            gap: '10px',
+            gap: '12px',
             borderTop: '1px solid #e0e0e0',
-            boxShadow: '0 -2px 4px rgba(0,0,0,0.1)',
-            borderBottomLeftRadius: '10px',
-            borderBottomRightRadius: '10px',
+            boxShadow: '0 -4px 16px rgba(0,0,0,0.1)',
+            borderTopLeftRadius: '24px',
+            borderTopRightRadius: '24px',
         } as const,
         input: {
             flex: 1,
-            padding: '14px',
+            padding: '14px 18px',
             border: '1px solid #e0e0e0',
-            borderRadius: '8px',
+            borderRadius: '24px',
             fontSize: '16px',
+            // 移动端优化：增加内边距和圆角
         } as const,
         button: {
             background: '#007bff',
             color: 'white',
             border: 'none',
-            borderRadius: '8px',
+            borderRadius: '24px',
             padding: '14px 24px',
             cursor: 'pointer',
             fontSize: '16px',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
+            // 修复图标拉伸问题：使用固定尺寸
+            minWidth: '64px', // 防止按钮在移动端被压缩
         } as const,
         aiIcon: {
-            background: '#333',
-            color: 'white',
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
+            width: '40px', // 增大图标尺寸
+            height: '40px', // 保持宽高一致
+            borderRadius: '50%', // 确保圆形显示
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginRight: '12px',
-            fontSize: '14px',
+            marginRight: '0', // 移除右侧边距，改用气泡内间距
+            fontSize: '18px', // 增大字体
+            background: '#007bff', // 改用主色背景
         } as const,
         thinkingBubble: {
-            background: '#f9f9f9',
-            borderRadius: 14,
-            margin: '8px 0',
-            padding: '10px 14px',
+            background: '#f5f5f5',
+            borderRadius: 16,
+            margin: '12px 0 0',
+            padding: '12px 16px',
             fontSize: '14px',
             color: '#666',
             wordBreak: 'break-all',
-            display: 'none',
+            display: 'block', // 始终显示，由状态控制
         } as const,
     };
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     };
 
     useEffect(() => {
@@ -175,15 +180,15 @@ const App: React.FC = () => {
             const response = await client.chat.completions.create({
                 model: "DeepSeek-R1-Distill-Qwen-14B",
                 stream: true,
-                max_tokens: 1024,
-                temperature: 0.6,
-                top_p: 0.7,
-                frequency_penalty: 0,
+                max_tokens: 999999999, // 增加最大token限制
+                temperature: 0.7,
+                top_p: 0.8,
+                frequency_penalty: 0.2,
                 messages: [
                     {
                         "role": "system",
-                        "content": "You are a helpful assistant that shows thinking process. " +
-                                   "Respond with [THINKING] tag for reasoning and [ANSWER] tag for final answer."
+                        "content": "You are a helpful assistant that shows thinking process in detail. " +
+                                   "Respond with clear reasoning steps before giving the final answer."
                     },
                     {
                         "role": "user",
@@ -198,24 +203,20 @@ const App: React.FC = () => {
 
             for await (const part of response) {
                 const content = part.choices[0]?.delta?.content || '';
-                if (content.includes('[THINKING]')) {
+                if (content.startsWith('THINKING:')) {
                     inThinking = true;
-                    thinkingProcess += content.replace('[THINKING]', '').trim();
-                } else if (content.includes('[ANSWER]')) {
+                    thinkingProcess += content.replace('THINKING:', '').trim() + ' ';
+                } else if (content.startsWith('ANSWER:')) {
                     inThinking = false;
-                    fullAnswer += content.replace('[ANSWER]', '').trim();
+                    fullAnswer += content.replace('ANSWER:', '').trim() + ' ';
                 } else {
-                    if (inThinking) {
-                        thinkingProcess += content;
-                    } else {
-                        fullAnswer += content;
-                    }
+                    inThinking ? thinkingProcess += content : fullAnswer += content;
                 }
             }
 
             const aiMessage: Message = {
-                content: fullAnswer,
-                thinkingContent: thinkingProcess,
+                content: fullAnswer.trim(),
+                thinkingContent: thinkingProcess.trim(),
                 isAI: true,
                 timestamp: new Date(),
             };
@@ -234,9 +235,7 @@ const App: React.FC = () => {
 
     return (
         <div style={styles.container}>
-            <div style={styles.header}>
-                <h2 style={{ margin: 0 }}>人工智能 AI 问答</h2>
-            </div>
+            <div style={styles.header}>人工智能 AI 问答</div>
             <div style={styles.subHeader}>AI问答（DeepSeek - R1）</div>
 
             <div style={styles.chatContainer}>
@@ -245,20 +244,18 @@ const App: React.FC = () => {
                         <div
                             key={index}
                             style={message.isAI 
-                                ? { display: 'flex', alignItems: 'flex-start', marginBottom: '24px' } 
-                                : { display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }
+                                ? { display: 'flex', alignItems: 'flex-start', marginBottom: '20px' } 
+                                : { display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }
                             }
                         >
-                            {message.isAI && <div style={styles.aiIcon}>AI</div>}
+                            {message.isAI && (
+                                <div style={styles.aiIcon}>AI</div>
+                            )}
                             <div style={message.isAI ? styles.aiBubble : styles.userBubble}>
                                 {message.content}
                                 {message.thinkingContent && (
-                                    <div style={{ 
-                                        ...styles.thinkingBubble, 
-                                        display: 'block', 
-                                        wordBreak: 'break-all'
-                                    }}>
-                                        <span style={{ color: '#999', fontSize: '12px', marginRight: '6px' }}>思考过程：</span>
+                                    <div style={styles.thinkingBubble}>
+                                        <span style={{ color: '#999', fontSize: '14px', marginRight: '8px' }}>思考过程：</span>
                                         {message.thinkingContent}
                                     </div>
                                 )}
@@ -266,12 +263,12 @@ const App: React.FC = () => {
                         </div>
                     ))}
                     {loading && (
-                        <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '20px' }}>
                             <div style={styles.aiIcon}>AI</div>
                             <div style={styles.aiBubble}>思考中...</div>
                         </div>
                     )}
-                    <div ref={messagesEndRef} />
+                    <div ref={messagesEndRef} style={{ height: '40px', visibility: 'hidden' }} />
                 </div>
             </div>
 
@@ -280,16 +277,12 @@ const App: React.FC = () => {
                     type="text"
                     style={styles.input}
                     value={input}
-                    placeholder="输入你的问题"
+                    placeholder="输入你的问题（支持长文本）"
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
                 />
-                <button
-                    style={styles.button}
-                    onClick={handleSubmit}
-                    disabled={loading}
-                >
-                    <SendIcon style={{ fontSize: '20px' }} />
+                <button style={styles.button} onClick={handleSubmit} disabled={loading}>
+                    <SendIcon style={{ fontSize: '24px' }} />
                 </button>
             </div>
         </div>
